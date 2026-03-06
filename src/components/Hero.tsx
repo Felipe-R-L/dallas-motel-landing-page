@@ -4,11 +4,22 @@ import { ChevronDown } from 'lucide-react';
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <img
-        src="https://images.pexels.com/photos/164595/pexels-photo-164595.jpeg?auto=compress&cs=tinysrgb&w=1920"
-        alt=""
+      
+      <video
         className="absolute inset-0 w-full h-full object-cover"
-      />
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="/images/hero-bg2.jpg"
+      >
+        <source src="/images/hero-video.mp4" type="video/mp4" />
+        <img
+          src="/images/hero-bg2.jpg"
+          alt=""
+          className="absolute inset-0 w-full h-full mb-4 object-cover"
+        />
+      </video>
       <div className="absolute inset-0 bg-velvet-950/75" />
       <div className="absolute inset-0 bg-gradient-to-b from-velvet-950/60 via-transparent to-velvet-950/80" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.08),transparent_60%)]" />
