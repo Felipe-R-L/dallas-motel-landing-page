@@ -15,6 +15,7 @@ export default function Menu() {
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    document.title = 'Cardápio de Room Service | Dallas Motel';
     fetchData();
   }, []);
 

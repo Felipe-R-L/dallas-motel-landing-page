@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import Header from '../components/Header';
 import Hero from '../components/Hero';
 import Suites from '../components/Suites';
@@ -9,6 +10,11 @@ import Footer from '../components/Footer';
 import WhatsAppFAB from '../components/WhatsAppFAB';
 
 export default function Home() {
+  useEffect(() => {
+    document.title =
+      'Dallas Motel em Pitangueiras, SP | Privacidade, Conforto e Tradição';
+  }, []);
+
   return (
     <>
       <Header />

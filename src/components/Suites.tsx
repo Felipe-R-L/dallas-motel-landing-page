@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabase';
 import type { SuiteRow } from '../types/database';
 import type { RateMode } from '../lib/pricing';
 import { detectRateMode } from '../lib/pricing';
@@ -22,6 +21,7 @@ export default function Suites() {
 
   useEffect(() => {
     const load = async () => {
+      const { supabase } = await import('../lib/supabase');
       const [detected, result] = await Promise.all([
         detectRateMode(),
         supabase
@@ -78,11 +78,11 @@ export default function Suites() {
             <Spinner />
           </div>
         ) : error ? (
-          <p className="text-center text-gray-500 py-16">
+          <p className="text-center text-gray-400 py-16">
             {`N\u00E3o foi poss\u00EDvel carregar as su\u00EDtes. Tente novamente mais tarde.`}
           </p>
         ) : suites.length === 0 ? (
-          <p className="text-center text-gray-500 py-16">
+          <p className="text-center text-gray-400 py-16">
             {`Nenhuma su\u00EDte dispon\u00EDvel no momento.`}
           </p>
         ) : (

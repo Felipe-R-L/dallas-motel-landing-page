@@ -40,7 +40,7 @@ export default function Legacy() {
     <section id="legado" className="relative py-24 sm:py-32 px-4 sm:px-6 overflow-hidden">
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/legacy-bg.png')" }}
+        style={{ backgroundImage: "url('/images/legacy-bg.webp')" }}
       />
       
       <div className="absolute inset-0 bg-velvet-950/85" />

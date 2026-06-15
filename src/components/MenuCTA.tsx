@@ -14,8 +14,10 @@ export default function MenuCTA() {
           className="relative overflow-hidden rounded-2xl border border-gold-400/20 px-8 py-14 sm:px-16 text-center"
         >
           <img
-            src="/images/menu-cta-bg.jpg"
+            src="/images/menu-cta-bg.webp"
             alt=""
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-velvet-950/90 via-velvet-900/80 to-velvet-950/90" />

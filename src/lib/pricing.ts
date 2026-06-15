@@ -1,5 +1,3 @@
-import { supabase } from './supabase';
-
 export type RateMode = 'weekday' | 'weekend' | 'holiday';
 
 export async function detectRateMode(): Promise<RateMode> {
@@ -9,6 +7,8 @@ export async function detectRateMode(): Promise<RateMode> {
   const dd = String(today.getDate()).padStart(2, '0');
   const dateStr = `${yyyy}-${mm}-${dd}`;
 
+  // Import dinamico: mantem o supabase fora do bundle inicial da home.
+  const { supabase } = await import('./supabase');
   const { data } = await supabase
     .from('holidays')
     .select('id')

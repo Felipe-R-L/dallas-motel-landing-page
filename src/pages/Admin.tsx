@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LogOut, Package, Tag, ArrowLeft, Lock, BedDouble, CalendarDays, Users } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
@@ -18,6 +18,10 @@ export default function Admin() {
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Painel Admin | Dallas Motel';
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

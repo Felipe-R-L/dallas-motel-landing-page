@@ -4,22 +4,15 @@ import { ChevronDown } from 'lucide-react';
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      
-      <video
+      <img
+        src="/images/hero-bg2-1280.webp"
+        srcSet="/images/hero-bg2-768.webp 768w, /images/hero-bg2-1280.webp 1280w, /images/hero-bg2-1600.webp 1600w"
+        sizes="100vw"
+        alt="Fachada e ambiente do Dallas Motel em Pitangueiras, SP"
+        fetchPriority="high"
+        decoding="async"
         className="absolute inset-0 w-full h-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster="/images/hero-bg2.jpg"
-      >
-        <source src="/images/hero-video.mp4" type="video/mp4" />
-        <img
-          src="/images/hero-bg2.jpg"
-          alt=""
-          className="absolute inset-0 w-full h-full mb-4 object-cover"
-        />
-      </video>
+      />
       <div className="absolute inset-0 bg-velvet-950/75" />
       <div className="absolute inset-0 bg-gradient-to-b from-velvet-950/60 via-transparent to-velvet-950/80" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.08),transparent_60%)]" />
@@ -84,6 +77,7 @@ export default function Hero() {
       >
         <motion.a
           href="#suites"
+          aria-label="Rolar para as suítes"
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           className="block"

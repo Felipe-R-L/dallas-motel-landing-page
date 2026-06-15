@@ -20,7 +20,7 @@ export default function Footer() {
             >
               Dallas Motel
             </a>
-            <p className="text-gray-500 text-sm mt-4 leading-relaxed max-w-xs">
+            <p className="text-gray-400 text-sm mt-4 leading-relaxed max-w-xs">
               Privacidade, conforto e tradição na zona rural de Pitangueiras.
               Uma história de sucesso a serviço dos seus melhores momentos.
             </p>
@@ -35,14 +35,14 @@ export default function Footer() {
                 <a
                   key={link.href}
                   href={link.href}
-                  className="block text-gray-500 hover:text-gold-400 text-sm transition-colors duration-300"
+                  className="block text-gray-400 hover:text-gold-400 text-sm transition-colors duration-300"
                 >
                   {link.label}
                 </a>
               ))}
               <Link
                 to="/cardapio"
-                className="block text-gray-500 hover:text-gold-400 text-sm transition-colors duration-300"
+                className="block text-gray-400 hover:text-gold-400 text-sm transition-colors duration-300"
               >
                 Cardápio Digital
               </Link>
@@ -53,7 +53,7 @@ export default function Footer() {
             <h4 className="text-white font-semibold text-sm tracking-wider uppercase mb-5">
               Contato
             </h4>
-            <div className="space-y-3 text-gray-500 text-sm">
+            <div className="space-y-3 text-gray-400 text-sm">
               <p>Estrada Municipal Pitangueiras-Viradouro, km 3,5</p>
               <p>Pitangueiras, SP</p>
               <p>(16) 99102-3129</p>
@@ -70,13 +70,13 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-velvet-800/50 mt-12 pt-8 flex items-center justify-between">
-          <p className="text-gray-600 text-xs">
+          <p className="text-gray-400 text-xs">
             &copy; {new Date().getFullYear()} Dallas Motel. Todos os direitos
             reservados.
           </p>
           <Link
             to="/admin"
-            className="text-gray-700 hover:text-gray-500 text-xs transition-colors"
+            className="text-gray-400 hover:text-gold-400 text-xs transition-colors"
           >
             Admin
           </Link>

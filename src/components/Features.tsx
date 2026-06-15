@@ -8,28 +8,28 @@ const features = [
     title: 'Privacidade Total',
     description:
       'Entrada e garagens individuais garantem total discrição para você e seu acompanhante.',
-    image: '/images/feature-privacy.jpg',
+    image: '/images/feature-privacy.webp',
   },
   {
     icon: Star,
     title: 'Padrão Hotel Dallas',
     description:
       'O mesmo padrão de qualidade do reconhecido Hotel Dallas no centro de Pitangueiras.',
-    image: '/images/feature-standard.jpg',
+    image: '/images/feature-standard.webp',
   },
   {
     icon: Sparkles,
     title: 'Higienização Rigorosa',
     description:
       'Processo completo de limpeza e higienização em cada suíte, garantindo segurança e conforto.',
-    image: '/images/feature-hygiene.jpg',
+    image: '/images/feature-hygiene.webp',
   },
   {
     icon: Car,
     title: 'Garagem Privativa',
     description:
       'Estacionamento coberto e privativo integrado à sua suíte, com entrada independente.',
-    image: '/images/feature-garage.jpg',
+    image: '/images/feature-garage.webp',
   },
 ];
 
@@ -57,6 +57,10 @@ export default function Features() {
                 <img
                   src={feature.image}
                   alt={feature.title}
+                  width="600"
+                  height="400"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 {/* Gradient overlay so content below blends nicely */}
