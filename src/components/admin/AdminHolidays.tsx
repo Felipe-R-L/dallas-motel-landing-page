@@ -134,6 +134,7 @@ export default function AdminHolidays() {
               </div>
               <button
                 onClick={() => removeHoliday(h.id)}
+                aria-label={`Remover feriado ${h.name}`}
                 className="p-2 text-gray-500 hover:text-red-400 transition-colors"
               >
                 <Trash2 size={15} />

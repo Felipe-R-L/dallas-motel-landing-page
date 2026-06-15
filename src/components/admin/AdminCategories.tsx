@@ -143,12 +143,14 @@ export default function AdminCategories() {
                   />
                   <button
                     onClick={() => updateCategory(cat.id)}
+                    aria-label="Salvar categoria"
                     className="p-1.5 text-emerald-400 hover:text-emerald-300"
                   >
                     <Check size={16} />
                   </button>
                   <button
                     onClick={() => setEditingId(null)}
+                    aria-label="Cancelar edição"
                     className="p-1.5 text-gray-500 hover:text-gray-300"
                   >
                     <X size={16} />
@@ -159,12 +161,14 @@ export default function AdminCategories() {
                   <span className="flex-1 text-white text-sm">{cat.name}</span>
                   <button
                     onClick={() => startEdit(cat)}
+                    aria-label={`Editar ${cat.name}`}
                     className="p-1.5 text-gray-500 hover:text-gold-400 transition-colors"
                   >
                     <Pencil size={15} />
                   </button>
                   <button
                     onClick={() => deleteCategory(cat.id)}
+                    aria-label={`Excluir ${cat.name}`}
                     className="p-1.5 text-gray-500 hover:text-red-400 transition-colors"
                   >
                     <Trash2 size={15} />

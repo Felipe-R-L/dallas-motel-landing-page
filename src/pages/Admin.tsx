@@ -114,6 +114,7 @@ export default function Admin() {
           <div className="flex items-center gap-4">
             <Link
               to="/"
+              aria-label="Voltar ao site"
               className="text-gray-500 hover:text-gray-300 transition-colors"
             >
               <ArrowLeft size={18} />
@@ -124,6 +125,7 @@ export default function Admin() {
           </div>
           <button
             onClick={signOut}
+            aria-label="Sair"
             className="flex items-center gap-2 text-gray-400 hover:text-red-400 text-sm transition-colors"
           >
             <LogOut size={16} />

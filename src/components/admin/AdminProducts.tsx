@@ -176,12 +176,14 @@ export default function AdminProducts() {
                 </button>
                 <button
                   onClick={() => handleEdit(product)}
+                  aria-label={`Editar ${product.name}`}
                   className="p-2 text-gray-500 hover:text-gold-400 transition-colors"
                 >
                   <Pencil size={15} />
                 </button>
                 <button
                   onClick={() => deleteProduct(product.id)}
+                  aria-label={`Excluir ${product.name}`}
                   className="p-2 text-gray-500 hover:text-red-400 transition-colors"
                 >
                   <Trash2 size={15} />

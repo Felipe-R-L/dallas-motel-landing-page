@@ -90,6 +90,7 @@ export default function SuiteCard({ suite, rateMode, index }: SuiteCardProps) {
               <button
                 onClick={() => setHours((h) => Math.max(minHours, h - 1))}
                 disabled={hours <= minHours}
+                aria-label="Diminuir uma hora"
                 className="w-8 h-8 rounded-full bg-velvet-700/80 text-gray-300 flex items-center justify-center hover:bg-velvet-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <Minus size={14} />
@@ -100,6 +101,7 @@ export default function SuiteCard({ suite, rateMode, index }: SuiteCardProps) {
               <button
                 onClick={() => setHours((h) => Math.min(12, h + 1))}
                 disabled={hours >= 12}
+                aria-label="Aumentar uma hora"
                 className="w-8 h-8 rounded-full bg-velvet-700/80 text-gray-300 flex items-center justify-center hover:bg-velvet-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <Plus size={14} />

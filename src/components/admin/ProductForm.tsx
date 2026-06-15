@@ -93,6 +93,7 @@ export default function ProductForm({
           </h2>
           <button
             onClick={onClose}
+            aria-label="Fechar"
             className="text-gray-500 hover:text-gray-300 transition-colors"
           >
             <X size={20} />

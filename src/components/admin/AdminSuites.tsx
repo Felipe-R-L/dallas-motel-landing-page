@@ -218,12 +218,14 @@ export default function AdminSuites() {
                     </button>
                     <button
                       onClick={() => handleEdit(suite)}
+                      aria-label={`Editar ${suite.name}`}
                       className="p-2 text-gray-500 hover:text-gold-400 transition-colors"
                     >
                       <Pencil size={15} />
                     </button>
                     <button
                       onClick={() => deleteSuite(suite.id)}
+                      aria-label={`Excluir ${suite.name}`}
                       className="p-2 text-gray-500 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={15} />

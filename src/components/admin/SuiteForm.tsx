@@ -153,6 +153,7 @@ export default function SuiteForm({ suite, onClose, onSave }: SuiteFormProps) {
           </h2>
           <button
             onClick={onClose}
+            aria-label="Fechar"
             className="text-gray-500 hover:text-gray-300 transition-colors"
           >
             <X size={20} />
@@ -331,6 +332,7 @@ export default function SuiteForm({ suite, onClose, onSave }: SuiteFormProps) {
                     <button
                       type="button"
                       onClick={() => removeAmenity(i)}
+                      aria-label={`Remover ${amenity}`}
                       className="text-gray-500 hover:text-red-400 transition-colors"
                     >
                       <Trash2 size={10} />

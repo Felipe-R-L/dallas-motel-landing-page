@@ -66,6 +66,7 @@ export default function Menu() {
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4">
           <Link
             to="/"
+            aria-label="Voltar ao site"
             className="text-gray-400 hover:text-white transition-colors"
           >
             <ArrowLeft size={20} />
@@ -74,23 +75,23 @@ export default function Menu() {
             <h1 className="font-playfair text-xl font-bold text-gold-400">
               Dallas Motel
             </h1>
-            <p className="text-xs text-gray-500">Cardapio Digital</p>
+            <p className="text-xs text-gray-400">Cardapio Digital</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="relative mb-6">
           <Search
             size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
           />
           <input
             type="text"
             placeholder="Buscar produtos..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-velvet-800/60 border border-velvet-700/50 rounded-lg pl-12 pr-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-gold-400/50 transition-colors"
+            className="w-full bg-velvet-800/60 border border-velvet-700/50 rounded-lg pl-12 pr-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-gold-400/50 transition-colors"
           />
         </div>
 
@@ -129,7 +130,7 @@ export default function Menu() {
         ) : error ? (
           <div className="text-center py-20">
             <UtensilsCrossed size={40} className="mx-auto text-gray-600 mb-4" />
-            <p className="text-gray-500">
+            <p className="text-gray-400">
               Nao foi possivel carregar o cardapio. Tente novamente mais tarde.
             </p>
           </div>
@@ -142,14 +143,14 @@ export default function Menu() {
         ) : (
           <div className="text-center py-20">
             <UtensilsCrossed size={40} className="mx-auto text-gray-600 mb-4" />
-            <p className="text-gray-500">
+            <p className="text-gray-400">
               {search
                 ? 'Nenhum produto encontrado.'
                 : 'Nenhum produto disponivel no momento.'}
             </p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
