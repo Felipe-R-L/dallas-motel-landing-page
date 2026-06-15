@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
-import { UserPlus, Trash2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { UserPlus, ShieldCheck, Users, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import Spinner from '../ui/Spinner';
 
-type AdminUser = {
+type AppUser = {
   user_id: string;
   email: string;
   created_at: string;
+  is_admin: boolean;
+  is_self: boolean;
 };
 
-type FnResponse = { ok?: boolean; error?: string; admins?: AdminUser[] };
+type FnResponse = { ok?: boolean; error?: string; users?: AppUser[] };
 
 async function callAdminFn(body: Record<string, unknown>): Promise<FnResponse> {
   const { data, error } = await supabase.functions.invoke('admin-users', {
@@ -20,8 +22,9 @@ async function callAdminFn(body: Record<string, unknown>): Promise<FnResponse> {
 }
 
 export default function AdminUsers() {
-  const [admins, setAdmins] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [makeAdmin, setMakeAdmin] = useState(true);
@@ -31,14 +34,14 @@ export default function AdminUsers() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    fetchAdmins();
+    fetchUsers();
   }, []);
 
-  const fetchAdmins = async () => {
+  const fetchUsers = async () => {
     setLoading(true);
     const res = await callAdminFn({ action: 'list' });
     if (res.error) setError(res.error);
-    else setAdmins(res.admins ?? []);
+    else setUsers(res.users ?? []);
     setLoading(false);
   };
 
@@ -77,25 +80,28 @@ export default function AdminUsers() {
     setEmail('');
     setPassword('');
     setMakeAdmin(true);
-    fetchAdmins();
+    fetchUsers();
   };
 
-  const removeAdmin = async (userId: string, userEmail: string) => {
-    if (
-      !confirm(
-        `Remover o acesso de administrador de ${userEmail}? O login continua existindo, mas perde o acesso ao painel.`
-      )
-    )
-      return;
+  const setAdmin = async (user: AppUser, isAdmin: boolean) => {
+    const verb = isAdmin ? 'promover' : 'rebaixar';
+    if (!confirm(`Deseja ${verb} ${user.email}?`)) return;
 
     setError('');
     setSuccess('');
-    const res = await callAdminFn({ action: 'remove_admin', user_id: userId });
+    setPendingId(user.user_id);
+    const res = await callAdminFn({
+      action: 'set_admin',
+      user_id: user.user_id,
+      isAdmin,
+    });
+    setPendingId(null);
+
     if (res.error) {
       setError(res.error);
       return;
     }
-    fetchAdmins();
+    fetchUsers();
   };
 
   const formatDate = (iso: string) =>
@@ -186,39 +192,67 @@ export default function AdminUsers() {
       </div>
 
       <h3 className="text-white text-sm font-semibold mb-3 flex items-center gap-2">
-        <ShieldCheck size={16} className="text-gold-400" />
-        Administradores ({admins.length})
+        <Users size={16} className="text-gold-400" />
+        Usuarios ({users.length})
       </h3>
 
       {loading ? (
         <div className="flex justify-center py-12">
           <Spinner />
         </div>
-      ) : admins.length === 0 ? (
+      ) : users.length === 0 ? (
         <div className="text-center py-12 bg-velvet-800/30 rounded-xl border border-velvet-700/30">
-          <ShieldCheck size={32} className="mx-auto text-gray-600 mb-3" />
-          <p className="text-gray-500 text-sm">Nenhum administrador encontrado.</p>
+          <Users size={32} className="mx-auto text-gray-600 mb-3" />
+          <p className="text-gray-500 text-sm">Nenhum usuario encontrado.</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {admins.map((a) => (
+          {users.map((u) => (
             <div
-              key={a.user_id}
-              className="flex items-center justify-between bg-velvet-800/40 border border-velvet-700/40 rounded-lg px-4 py-3"
+              key={u.user_id}
+              className="flex items-center justify-between gap-3 bg-velvet-800/40 border border-velvet-700/40 rounded-lg px-4 py-3"
             >
               <div className="min-w-0">
-                <p className="text-white text-sm truncate">{a.email}</p>
-                <p className="text-gray-500 text-xs">
-                  Desde {formatDate(a.created_at)}
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white text-sm truncate">{u.email}</p>
+                  {u.is_admin && (
+                    <span className="inline-flex items-center gap-1 text-[10px] text-gold-400 bg-gold-400/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                      <ShieldCheck size={11} />
+                      Admin
+                    </span>
+                  )}
+                  {u.is_self && (
+                    <span className="text-[10px] text-gray-500 flex-shrink-0">
+                      (voce)
+                    </span>
+                  )}
+                </div>
+                <p className="text-gray-500 text-xs">Desde {formatDate(u.created_at)}</p>
               </div>
-              <button
-                onClick={() => removeAdmin(a.user_id, a.email)}
-                className="p-2 text-gray-500 hover:text-red-400 transition-colors flex-shrink-0"
-                title="Remover acesso de administrador"
-              >
-                <Trash2 size={15} />
-              </button>
+
+              {u.is_admin ? (
+                <button
+                  onClick={() => setAdmin(u, false)}
+                  disabled={u.is_self || pendingId === u.user_id}
+                  className="text-xs text-gray-400 hover:text-red-400 border border-velvet-700/50 hover:border-red-400/40 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  title={
+                    u.is_self
+                      ? 'Voce nao pode remover o proprio acesso'
+                      : 'Remover acesso de administrador'
+                  }
+                >
+                  {pendingId === u.user_id ? '...' : 'Rebaixar'}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setAdmin(u, true)}
+                  disabled={pendingId === u.user_id}
+                  className="text-xs text-velvet-900 bg-gold-400 hover:bg-gold-500 px-3 py-1.5 rounded-lg font-semibold transition-colors disabled:opacity-50 flex-shrink-0"
+                  title="Promover a administrador"
+                >
+                  {pendingId === u.user_id ? '...' : 'Promover'}
+                </button>
+              )}
             </div>
           ))}
         </div>

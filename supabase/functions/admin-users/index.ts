@@ -5,9 +5,9 @@
 // mas SO depois de confirmar que quem chamou ja e um admin.
 //
 // Acoes (POST { action }):
-//   - list         => lista os admins atuais (email + data)
-//   - create       => cria um usuario novo { email, password, isAdmin }
-//   - remove_admin => revoga o status de admin { user_id }
+//   - list      => lista TODOS os usuarios (email, data, is_admin, is_self)
+//   - create    => cria um usuario novo { email, password, isAdmin }
+//   - set_admin => promove/rebaixa um usuario { user_id, isAdmin }
 //
 // Deploy: supabase functions deploy admin-users
 
@@ -61,22 +61,41 @@ Deno.serve(async (req) => {
     const action = body.action as string;
 
     if (action === 'list') {
-      const { data: rows, error } = await admin
-        .from('admin_users')
-        .select('user_id, created_at')
-        .order('created_at');
-      if (error) return json({ error: 'Erro ao listar administradores.' });
-
-      const admins = [];
-      for (const r of rows ?? []) {
-        const { data } = await admin.auth.admin.getUserById(r.user_id);
-        admins.push({
-          user_id: r.user_id,
-          email: data.user?.email ?? '—',
-          created_at: r.created_at,
+      // Coleta todos os usuarios (paginado) e cruza com a lista de admins.
+      const allUsers = [];
+      let page = 1;
+      const perPage = 1000;
+      while (true) {
+        const { data, error } = await admin.auth.admin.listUsers({
+          page,
+          perPage,
         });
+        if (error) return json({ error: 'Erro ao listar usuarios.' });
+        allUsers.push(...data.users);
+        if (data.users.length < perPage) break;
+        page++;
       }
-      return json({ admins });
+
+      const { data: adminRows, error: adminRowsErr } = await admin
+        .from('admin_users')
+        .select('user_id');
+      if (adminRowsErr) return json({ error: 'Erro ao listar administradores.' });
+      const adminSet = new Set((adminRows ?? []).map((r) => r.user_id));
+
+      const users = allUsers
+        .map((u) => ({
+          user_id: u.id,
+          email: u.email ?? '—',
+          created_at: u.created_at,
+          is_admin: adminSet.has(u.id),
+          is_self: u.id === user.id,
+        }))
+        .sort((a, b) => {
+          if (a.is_admin !== b.is_admin) return a.is_admin ? -1 : 1;
+          return a.email.localeCompare(b.email);
+        });
+
+      return json({ users });
     }
 
     if (action === 'create') {
@@ -117,17 +136,26 @@ Deno.serve(async (req) => {
       return json({ ok: true, user_id: created.user.id });
     }
 
-    if (action === 'remove_admin') {
+    if (action === 'set_admin') {
       const userId = String(body.user_id ?? '');
+      const makeAdmin = body.isAdmin === true;
       if (!userId) return json({ error: 'user_id obrigatorio.' });
-      if (userId === user.id) {
+      if (userId === user.id && !makeAdmin) {
         return json({ error: 'Voce nao pode remover o proprio acesso.' });
       }
-      const { error } = await admin
-        .from('admin_users')
-        .delete()
-        .eq('user_id', userId);
-      if (error) return json({ error: 'Erro ao remover o administrador.' });
+
+      if (makeAdmin) {
+        const { error } = await admin
+          .from('admin_users')
+          .upsert({ user_id: userId }, { onConflict: 'user_id' });
+        if (error) return json({ error: 'Erro ao promover o usuario.' });
+      } else {
+        const { error } = await admin
+          .from('admin_users')
+          .delete()
+          .eq('user_id', userId);
+        if (error) return json({ error: 'Erro ao rebaixar o usuario.' });
+      }
       return json({ ok: true });
     }
 
