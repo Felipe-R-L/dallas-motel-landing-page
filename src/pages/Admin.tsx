@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Package, Tag, ArrowLeft, Lock, BedDouble, CalendarDays } from 'lucide-react';
+import { LogOut, Package, Tag, ArrowLeft, Lock, BedDouble, CalendarDays, Users } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import AdminProducts from '../components/admin/AdminProducts';
 import AdminCategories from '../components/admin/AdminCategories';
 import AdminSuites from '../components/admin/AdminSuites';
 import AdminHolidays from '../components/admin/AdminHolidays';
+import AdminUsers from '../components/admin/AdminUsers';
+import Spinner from '../components/ui/Spinner';
 
 export default function Admin() {
   const { user, loading, signIn, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<
-    'products' | 'categories' | 'suites' | 'holidays'
+    'products' | 'categories' | 'suites' | 'holidays' | 'users'
   >('products');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,7 +31,7 @@ export default function Admin() {
   if (loading) {
     return (
       <div className="bg-velvet-950 min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
@@ -172,6 +174,17 @@ export default function Admin() {
             <CalendarDays size={16} />
             Feriados
           </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'users'
+                ? 'border-gold-400 text-gold-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300'
+            }`}
+          >
+            <Users size={16} />
+            Usuarios
+          </button>
         </div>
       </div>
 
@@ -180,6 +193,7 @@ export default function Admin() {
         {activeTab === 'categories' && <AdminCategories />}
         {activeTab === 'suites' && <AdminSuites />}
         {activeTab === 'holidays' && <AdminHolidays />}
+        {activeTab === 'users' && <AdminUsers />}
       </div>
     </div>
   );

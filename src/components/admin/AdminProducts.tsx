@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, ImageOff, Package } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { MenuProduct, MenuCategory } from '../../types/database';
+import { formatPrice } from '../../lib/format';
+import Spinner from '../ui/Spinner';
 import ProductForm from './ProductForm';
 
 export default function AdminProducts() {
@@ -12,6 +14,7 @@ export default function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<MenuProduct | null>(
     null
   );
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -26,26 +29,39 @@ export default function AdminProducts() {
       supabase.from('menu_categories').select('*').order('sort_order'),
     ]);
 
+    if (productsRes.error || categoriesRes.error) {
+      setActionError('Erro ao carregar os dados. Tente novamente.');
+    }
     if (productsRes.data) setProducts(productsRes.data);
     if (categoriesRes.data) setCategories(categoriesRes.data);
     setLoading(false);
   };
 
   const toggleAvailability = async (product: MenuProduct) => {
+    setActionError('');
     const { error } = await supabase
       .from('menu_products')
       .update({ is_available: !product.is_available })
       .eq('id', product.id);
-    if (!error) fetchData();
+    if (error) {
+      setActionError('Erro ao atualizar a disponibilidade do produto.');
+      return;
+    }
+    fetchData();
   };
 
   const deleteProduct = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+    setActionError('');
     const { error } = await supabase
       .from('menu_products')
       .delete()
       .eq('id', id);
-    if (!error) fetchData();
+    if (error) {
+      setActionError('Erro ao excluir o produto.');
+      return;
+    }
+    fetchData();
   };
 
   const handleEdit = (product: MenuProduct) => {
@@ -63,19 +79,21 @@ export default function AdminProducts() {
     fetchData();
   };
 
-  const formatPrice = (price: number) =>
-    price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
 
   return (
     <div>
+      {actionError && (
+        <p className="mb-4 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2.5">
+          {actionError}
+        </p>
+      )}
       <div className="flex items-center justify-between mb-6">
         <p className="text-gray-400 text-sm">{products.length} produto(s)</p>
         <button
@@ -142,6 +160,9 @@ export default function AdminProducts() {
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={() => toggleAvailability(product)}
+                  role="switch"
+                  aria-checked={product.is_available}
+                  aria-label={`Disponibilidade de ${product.name}`}
                   className={`relative w-10 h-5 rounded-full transition-colors ${
                     product.is_available ? 'bg-emerald-500/80' : 'bg-velvet-700'
                   }`}

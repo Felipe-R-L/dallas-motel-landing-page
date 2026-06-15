@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload, Plus, Trash2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { uploadImage } from '../../lib/storage';
 import type { SuiteRow } from '../../types/database';
 
 interface SuiteFormProps {
@@ -43,30 +44,20 @@ export default function SuiteForm({ suite, onClose, onSave }: SuiteFormProps) {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
     setUploading(true);
     setError('');
 
-    const ext = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${ext}`;
-
-    const { data, error: uploadError } = await supabase.storage
-      .from('suite-images')
-      .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-    if (uploadError) {
-      setError('Erro ao enviar imagem.');
+    try {
+      const url = await uploadImage('suite-images', file);
+      setImageUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao enviar imagem.');
+    } finally {
       setUploading(false);
-      return;
     }
-
-    const { data: urlData } = supabase.storage
-      .from('suite-images')
-      .getPublicUrl(data.path);
-
-    setImageUrl(urlData.publicUrl);
-    setUploading(false);
   };
 
   const addAmenity = () => {
@@ -350,21 +341,26 @@ export default function SuiteForm({ suite, onClose, onSave }: SuiteFormProps) {
             )}
           </div>
 
-          <label className="flex items-center gap-3 cursor-pointer">
-            <div
+          <button
+            type="button"
+            role="switch"
+            aria-checked={isFeatured}
+            onClick={() => setIsFeatured(!isFeatured)}
+            className="flex items-center gap-3 cursor-pointer"
+          >
+            <span
               className={`relative w-10 h-5 rounded-full transition-colors ${
                 isFeatured ? 'bg-gold-400' : 'bg-velvet-700'
               }`}
-              onClick={() => setIsFeatured(!isFeatured)}
             >
               <span
                 className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
                   isFeatured ? 'left-5' : 'left-0.5'
                 }`}
               />
-            </div>
+            </span>
             <span className="text-gray-400 text-xs">Destacar esta suite</span>
-          </label>
+          </button>
 
           {error && <p className="text-red-400 text-xs">{error}</p>}
         </div>

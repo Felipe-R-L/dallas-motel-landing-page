@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ImageOff } from 'lucide-react';
 import type { MenuProduct } from '../../types/database';
+import { formatPrice } from '../../lib/format';
 
 interface ProductCardProps {
   product: MenuProduct;
@@ -8,9 +9,6 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index }: ProductCardProps) {
-  const formatPrice = (price: number) =>
-    price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}

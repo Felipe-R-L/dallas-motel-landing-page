@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, ImageOff, BedDouble, Star } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { SuiteRow } from '../../types/database';
+import { formatPrice } from '../../lib/format';
+import Spinner from '../ui/Spinner';
 import SuiteForm from './SuiteForm';
 
 export default function AdminSuites() {
@@ -9,35 +11,47 @@ export default function AdminSuites() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingSuite, setEditingSuite] = useState<SuiteRow | null>(null);
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     fetchSuites();
   }, []);
 
   const fetchSuites = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('suites')
       .select('*')
       .order('sort_order');
+    if (error) setActionError('Erro ao carregar as suites. Tente novamente.');
     if (data) setSuites(data);
     setLoading(false);
   };
 
   const toggleActive = async (suite: SuiteRow) => {
+    setActionError('');
     const { error } = await supabase
       .from('suites')
       .update({ is_active: !suite.is_active })
       .eq('id', suite.id);
-    if (!error) fetchSuites();
+    if (error) {
+      setActionError('Erro ao atualizar o status da suite.');
+      return;
+    }
+    fetchSuites();
   };
 
   const deleteSuite = async (id: string) => {
     if (!confirm('Tem certeza que deseja excluir esta suite?')) return;
+    setActionError('');
     const { error } = await supabase
       .from('suites')
       .delete()
       .eq('id', id);
-    if (!error) fetchSuites();
+    if (error) {
+      setActionError('Erro ao excluir a suite.');
+      return;
+    }
+    fetchSuites();
   };
 
   const handleEdit = (suite: SuiteRow) => {
@@ -55,19 +69,21 @@ export default function AdminSuites() {
     fetchSuites();
   };
 
-  const formatPrice = (price: number) =>
-    price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
 
   return (
     <div>
+      {actionError && (
+        <p className="mb-4 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2.5">
+          {actionError}
+        </p>
+      )}
       <div className="flex items-center justify-between mb-6">
         <p className="text-gray-400 text-sm">{suites.length} suite(s)</p>
         <button
@@ -186,6 +202,9 @@ export default function AdminSuites() {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => toggleActive(suite)}
+                      role="switch"
+                      aria-checked={suite.is_active}
+                      aria-label={`Status da ${suite.name}`}
                       className={`relative w-10 h-5 rounded-full transition-colors ${
                         suite.is_active ? 'bg-emerald-500/80' : 'bg-velvet-700'
                       }`}

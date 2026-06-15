@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { X, Upload } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { uploadImage } from '../../lib/storage';
 import type { MenuProduct, MenuCategory } from '../../types/database';
 
 interface ProductFormProps {
@@ -28,30 +29,20 @@ export default function ProductForm({
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
     setUploading(true);
     setError('');
 
-    const ext = file.name.split('.').pop();
-    const fileName = `${Date.now()}.${ext}`;
-
-    const { data, error: uploadError } = await supabase.storage
-      .from('menu-images')
-      .upload(fileName, file, { cacheControl: '3600', upsert: false });
-
-    if (uploadError) {
-      setError('Erro ao enviar imagem.');
+    try {
+      const url = await uploadImage('menu-images', file);
+      setImageUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao enviar imagem.');
+    } finally {
       setUploading(false);
-      return;
     }
-
-    const { data: urlData } = supabase.storage
-      .from('menu-images')
-      .getPublicUrl(data.path);
-
-    setImageUrl(urlData.publicUrl);
-    setUploading(false);
   };
 
   const handleSave = async () => {

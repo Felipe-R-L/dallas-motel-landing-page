@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, CalendarDays } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { HolidayRow } from '../../types/database';
+import Spinner from '../ui/Spinner';
 
 export default function AdminHolidays() {
   const [holidays, setHolidays] = useState<HolidayRow[]>([]);
@@ -52,11 +53,16 @@ export default function AdminHolidays() {
   };
 
   const removeHoliday = async (id: string) => {
+    setError('');
     const { error: dbError } = await supabase
       .from('holidays')
       .delete()
       .eq('id', id);
-    if (!dbError) fetchHolidays();
+    if (dbError) {
+      setError('Erro ao remover o feriado.');
+      return;
+    }
+    fetchHolidays();
   };
 
   const formatDate = (dateStr: string) => {
@@ -70,7 +76,7 @@ export default function AdminHolidays() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }

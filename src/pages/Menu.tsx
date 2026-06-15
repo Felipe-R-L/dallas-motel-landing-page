@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { MenuCategory, MenuProduct } from '../types/database';
 import ProductCard from '../components/menu/ProductCard';
+import Spinner from '../components/ui/Spinner';
 
 export default function Menu() {
   const [products, setProducts] = useState<MenuProduct[]>([]);
@@ -11,28 +12,41 @@ export default function Menu() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
-    const [productsRes, categoriesRes] = await Promise.all([
-      supabase
-        .from('menu_products')
-        .select('*, menu_categories(name)')
-        .eq('is_available', true)
-        .order('sort_order'),
-      supabase
-        .from('menu_categories')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order'),
-    ]);
+    setLoading(true);
+    setError(false);
+    try {
+      const [productsRes, categoriesRes] = await Promise.all([
+        supabase
+          .from('menu_products')
+          .select('*, menu_categories(name)')
+          .eq('is_available', true)
+          .order('sort_order'),
+        supabase
+          .from('menu_categories')
+          .select('*')
+          .eq('is_active', true)
+          .order('sort_order'),
+      ]);
 
-    if (productsRes.data) setProducts(productsRes.data);
-    if (categoriesRes.data) setCategories(categoriesRes.data);
-    setLoading(false);
+      if (productsRes.error || categoriesRes.error) {
+        setError(true);
+        return;
+      }
+
+      setProducts(productsRes.data ?? []);
+      setCategories(categoriesRes.data ?? []);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filtered = products.filter((p) => {
@@ -109,7 +123,14 @@ export default function Menu() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+            <Spinner />
+          </div>
+        ) : error ? (
+          <div className="text-center py-20">
+            <UtensilsCrossed size={40} className="mx-auto text-gray-600 mb-4" />
+            <p className="text-gray-500">
+              Nao foi possivel carregar o cardapio. Tente novamente mais tarde.
+            </p>
           </div>
         ) : filtered.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -4,9 +4,6 @@ import { MapPin, Phone, Clock, Navigation, MessageCircle } from 'lucide-react';
 import { WHATSAPP_URL, MAPS_URL } from '../data/constants';
 import SectionTitle from './SectionTitle';
 
-const MAPS_EMBED_URL =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3712.5!2d-48.22!3d-20.88!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zRGFsbGFzIE1vdGVs!5e0!3m2!1spt-BR!2sbr&q=Dallas+Motel+Estrada+Municipal+Pitangueiras+Viradouro';
-
 const MAPS_SEARCH_EMBED_URL =
   'https://www.google.com/maps?q=Dallas+Motel+Estrada+Municipal+Pitangueiras+Viradouro&output=embed';
 

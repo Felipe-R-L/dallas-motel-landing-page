@@ -6,6 +6,7 @@ import type { RateMode } from '../lib/pricing';
 import { detectRateMode } from '../lib/pricing';
 import SuiteCard from './SuiteCard';
 import SectionTitle from './SectionTitle';
+import Spinner from './ui/Spinner';
 
 const modes: { key: RateMode; label: string }[] = [
   { key: 'weekday', label: 'Segunda a Sexta' },
@@ -74,7 +75,7 @@ export default function Suites() {
 
         {loading ? (
           <div className="flex justify-center py-16">
-            <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+            <Spinner />
           </div>
         ) : error ? (
           <p className="text-center text-gray-500 py-16">

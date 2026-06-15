@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Pencil, Trash2, X, Check, Tag } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import type { MenuCategory } from '../../types/database';
+import Spinner from '../ui/Spinner';
 
 export default function AdminCategories() {
   const [categories, setCategories] = useState<MenuCategory[]>([]);
@@ -9,51 +10,72 @@ export default function AdminCategories() {
   const [newName, setNewName] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState('');
+  const [actionError, setActionError] = useState('');
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('menu_categories')
       .select('*')
       .order('sort_order');
+    if (error) setActionError('Erro ao carregar as categorias.');
     if (data) setCategories(data);
     setLoading(false);
   };
 
   const addCategory = async () => {
     if (!newName.trim()) return;
+    setActionError('');
     const { error } = await supabase
       .from('menu_categories')
       .insert({ name: newName.trim(), sort_order: categories.length });
-    if (!error) {
-      setNewName('');
-      fetchCategories();
+    if (error) {
+      setActionError(
+        error.code === '23505'
+          ? 'Ja existe uma categoria com esse nome.'
+          : 'Erro ao adicionar a categoria.'
+      );
+      return;
     }
+    setNewName('');
+    fetchCategories();
   };
 
   const updateCategory = async (id: string) => {
     if (!editingName.trim()) return;
+    setActionError('');
     const { error } = await supabase
       .from('menu_categories')
       .update({ name: editingName.trim() })
       .eq('id', id);
-    if (!error) {
-      setEditingId(null);
-      fetchCategories();
+    if (error) {
+      setActionError(
+        error.code === '23505'
+          ? 'Ja existe uma categoria com esse nome.'
+          : 'Erro ao atualizar a categoria.'
+      );
+      return;
     }
+    setEditingId(null);
+    fetchCategories();
   };
 
   const deleteCategory = async (id: string) => {
     if (!confirm('Excluir esta categoria? Produtos nela ficarao sem categoria.'))
       return;
+    setActionError('');
     const { error } = await supabase
       .from('menu_categories')
       .delete()
       .eq('id', id);
-    if (!error) fetchCategories();
+    if (error) {
+      setActionError('Erro ao excluir a categoria.');
+      return;
+    }
+    fetchCategories();
   };
 
   const startEdit = (cat: MenuCategory) => {
@@ -64,13 +86,18 @@ export default function AdminCategories() {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-2 border-gold-400/30 border-t-gold-400 rounded-full animate-spin" />
+        <Spinner />
       </div>
     );
   }
 
   return (
     <div className="max-w-lg">
+      {actionError && (
+        <p className="mb-4 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2.5">
+          {actionError}
+        </p>
+      )}
       <div className="flex gap-2 mb-6">
         <input
           type="text"
